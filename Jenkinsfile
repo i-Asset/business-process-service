@@ -1,4 +1,4 @@
-node('nimble-jenkins-slave') {
+node('iasset-jenkins-slave') {
 
     // -----------------------------------------------
     // --------------- Staging Branch ----------------
@@ -6,21 +6,21 @@ node('nimble-jenkins-slave') {
     if (env.BRANCH_NAME == 'staging') {
 
         stage('Clone and Update') {
-            git(url: 'https://github.com/nimble-platform/business-process-service.git', branch: env.BRANCH_NAME)
+            git(url: 'https://github.com/i-Asset/business-process-service.git', branch: env.BRANCH_NAME)
         }
 
         stage('Build Dependencies') {
-            sh 'rm -rf common'
-            sh 'git clone https://github.com/nimble-platform/common'
-            dir('common') {
+            sh 'rm -rf common-1'
+            sh 'git clone https://github.com/i-Asset/common-1.git'
+            dir('common-1') {
                 sh 'git checkout ' + env.BRANCH_NAME
                 sh 'mvn clean install'
             }
         }
-
-        stage('Run Tests') {
-            sh '#!/bin/bash \n source /var/jenkins_home/test_staging.sh && mvn clean test'
-        }
+//
+//        stage('Run Tests') {
+//            sh '#!/bin/bash \n source /var/jenkins_home/test_staging.sh && mvn clean test'
+//        }
 
         stage('Build Java') {
             sh 'mvn clean package -DskipTests'
@@ -31,11 +31,11 @@ node('nimble-jenkins-slave') {
         }
 
         stage('Push Docker') {
-            sh 'docker push nimbleplatform/business-process-service:staging'
+            sh 'docker push iassetplatform/business-process-service:staging'
         }
 
         stage('Deploy') {
-            sh 'ssh staging "cd /srv/nimble-staging/ && ./run-staging.sh restart-single business-process-service"'
+            sh 'ssh staging "cd /srv/docker-setup/staging/ && ./run-staging.sh restart-single business-process-service"'
         }
     }
 
@@ -45,13 +45,14 @@ node('nimble-jenkins-slave') {
     if (env.BRANCH_NAME == 'master') {
 
         stage('Clone and Update') {
-            git(url: 'https://github.com/nimble-platform/business-process-service.git', branch: env.BRANCH_NAME)
+            git(url: 'https://github.com/i-Asset/business-process-service.git', branch: env.BRANCH_NAME)
         }
 
+
         stage('Build Dependencies') {
-            sh 'rm -rf common'
-            sh 'git clone https://github.com/nimble-platform/common'
-            dir('common') {
+            sh 'rm -rf common-1'
+            sh 'git clone https://github.com/i-Asset/common-1.git'
+            dir('common-1') {
                 sh 'git checkout ' + env.BRANCH_NAME
                 sh 'mvn clean install'
             }
